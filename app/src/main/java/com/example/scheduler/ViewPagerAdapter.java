@@ -5,14 +5,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.scheduler.Tabs.NotificationFrag;
-import com.example.scheduler.Tabs.PastFrag;
-import com.example.scheduler.Tabs.ProfileFrag;
 import com.example.scheduler.Tabs.ScheduleFrag;
+import com.example.scheduler.Tabs.PastFrag;
+import com.example.scheduler.Tabs.NotificationFrag;
+import com.example.scheduler.Tabs.ProfileFrag;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
-    public ViewPagerAdapter(FragmentActivity fa) {
-        super(fa);
+    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+        super(fragmentActivity);
     }
 
     @NonNull

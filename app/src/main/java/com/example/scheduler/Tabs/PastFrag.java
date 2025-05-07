@@ -1,14 +1,17 @@
 package com.example.scheduler.Tabs;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.scheduler.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.scheduler.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +28,11 @@ public class PastFrag extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private RecyclerView recyclerView;
+    private TaskAdapter adapter;
+    private List<Task> taskList = new ArrayList<>();
+    private AppDatabaseHelper dbHelper;
 
     public PastFrag() {
         // Required empty public constructor
@@ -57,10 +65,25 @@ public class PastFrag extends Fragment {
         }
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_past, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+        recyclerView = view.findViewById(R.id.recyclerViewTasks);
+        dbHelper = new AppDatabaseHelper(getContext());
+
+        adapter = new TaskAdapter(taskList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+
+        loadPastTasks();
+
+        return view;
+    }
+
+    private void loadPastTasks() {
+        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+        taskList = dbHelper.getAllPastTasks(now);
+        adapter.setTaskList(taskList);
     }
 }

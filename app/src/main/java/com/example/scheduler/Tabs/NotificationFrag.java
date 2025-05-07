@@ -1,14 +1,19 @@
 package com.example.scheduler.Tabs;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
-
+import android.text.TextUtils;
+import android.view.*;
+import android.widget.*;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.example.scheduler.R;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.scheduler.*;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +30,12 @@ public class NotificationFrag extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private RecyclerView recyclerView;
+    private NotificationAdapter adapter;
+    private List<NotificationItem> notificationList = new ArrayList<>();
+    private AppDatabaseHelper dbHelper;
+    private FloatingActionButton fab;
 
     public NotificationFrag() {
         // Required empty public constructor
@@ -57,10 +68,44 @@ public class NotificationFrag extends Fragment {
         }
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notification, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+        recyclerView = view.findViewById(R.id.recyclerViewTasks);
+        fab = view.findViewById(R.id.fabAddTask);
+        dbHelper = new AppDatabaseHelper(getContext());
+
+        adapter = new NotificationAdapter(notificationList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+
+        loadNotifications();
+
+        fab.setOnClickListener(v -> showAddNotificationDialog());
+
+        return view;
+    }
+
+    private void loadNotifications() {
+        notificationList = dbHelper.getAllNotifications();
+        adapter.setNotificationList(notificationList);
+    }
+
+    private void showAddNotificationDialog() {
+        EditText et = new EditText(getContext());
+        new AlertDialog.Builder(getContext())
+                .setTitle("Add Notification")
+                .setView(et)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String msg = et.getText().toString().trim();
+                    if (!TextUtils.isEmpty(msg)) {
+                        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+                        dbHelper.insertNotification(new NotificationItem(0, msg, now));
+                        loadNotifications();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }
